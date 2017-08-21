@@ -5,6 +5,9 @@ import numpy as np
 class Parabolic:
     enumerate(['Explicit', 'Implicit'])
     def __init__(self):
+        return
+
+    def Initialize(self):
         self.U0 = 40
         self.N = 41
         self.h = 0.04
@@ -96,7 +99,8 @@ class Parabolic:
             print("\rtime = %.6f"%self.time, end="")
         print()
 
-    def Compute(self, scheme):
+    def Main(self, scheme):
+        self.Initialize()
         self.scheme = scheme
         self.Scheme_Printer()
         self.dinamic_viscosity()
@@ -113,7 +117,7 @@ def main():
     return ID
 
 def help():
-    prompt = """Compute function
+    prompt = """Main function
     0: 'Explicit'
     1: 'Implicit'"""
     print(prompt)
