@@ -60,10 +60,10 @@ class Parabolic:
         dirname = "Parabolic, {0}, d={1}".format(self.Scheme_name, self.diffusion)
         path = os.getcwd()
         dirname = os.path.join(path, dirname)
-        if os.path.isdir(dirname):
-            shutil.rmtree(dirname) # 디렉토리가 존재하면 삭제하고 다시 계산
-        os.mkdir(dirname)
         self.dirname = dirname
+        if os.path.isdir(dirname):
+            shutil.rmtree(dirname)  # 디렉토리가 존재하면 삭제하고 다시 계산# return # 디렉토리가 존재하면 덮어쓰기 #
+        os.mkdir(dirname)
 
     def Para_Write(self):
         filename = "{0}/{1}, d={2}.csv.".format(self.dirname, self.Scheme_name, self.diffusion)
@@ -88,9 +88,26 @@ class Parabolic:
             print("\rtime = %.6f"%self.time, end="")
         print()
 
+    def Lassonen_A_Mat(self):
+        self.A = np.zeros(3)
+        self.A[0] = -self.diffusion
+        self.A[1] = 1.0+2.0*self.diffusion
+        self.A[2] = -self.diffusion
+
     def Lassonen(self):
-        return
+        P = np.zeros(self.N)
+        Q = np.zeros(self.N)
+        Q[0] = self.U[0]
+        for i in range(1, self.N-1):
+            P[i] = -self.A[2] / ((self.A[0] * P[i-1]) + self.A[1])
+            Q[i] = (self.U[i] - (self.A[0] * Q[i-1])) / ((self.A[0] * P[i-1]) + self.A[1])
+        self.Unew[self.N-1] = Q[self.N-1]
+        for j in range(0, self.N-1):
+            i = self.N-2 - j
+            self.Unew[i] = P[i] * self.Unew[i+1] + Q[i]
+
     def Implicit_Solver(self):
+        self.Lassonen_A_Mat()
         for i in range(self.iter+1):
             self.Para_Write()
             self.Lassonen()
@@ -121,3 +138,23 @@ def help():
     0: 'Explicit'
     1: 'Implicit'"""
     print(prompt)
+
+PyCompute = Parabolic()
+print("What Will you Compute?")
+prompt = """
+1: Explicit
+2: Implicit
+
+Enter Number(1~2): """
+ID = 5
+I = 1
+while I:
+    if 0 < ID < 3:
+        I = 0
+    else:
+        print(prompt)
+        ID = int(input())
+if ID == 1:
+    PyCompute.Main('Explicit')
+if ID == 2:
+    PyCompute.Main('Implicit')
