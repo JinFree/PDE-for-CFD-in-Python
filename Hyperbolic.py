@@ -148,6 +148,7 @@ class Hyperbolic:
     def Main(self, scheme):
         self.scheme = scheme
         self.Scheme_Printer()
+        self.Initialize()
         CFL = [1.0, 0.5, 0.25]
         for i in CFL:
             self.Initialize_Time()

@@ -63,7 +63,7 @@ class Elliptic:
 
     def get_w(self):
         prompt = """Input w, 1.0 ~ 1.9
-        Enter w: """
+Enter w: """
         print(prompt)
         self.w = float(input())
         if 1.0 < self.w < 1.9:
@@ -157,6 +157,7 @@ class Elliptic:
         elif scheme == 'PSOR':
             self.PSOR_Solver()
         self.Para_Write()
+        print()
 
 def main():
     ID = Elliptic()
