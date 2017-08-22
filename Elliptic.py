@@ -5,6 +5,9 @@ import numpy as np
 class Elliptic:
     enumerate(['Jacobi', 'PGS', 'PSOR'])
     def __init__(self):
+        return
+
+    def Initialize(self):
         self.Gx = 21
         self.Gy = 41
         self.GridSize = 0.05
@@ -50,7 +53,7 @@ class Elliptic:
         Enter w: """
         print(prompt)
         self.w = float(input())
-        if self.w > 1.9:
+        if 1.0 < self.w < 1.9:
             print("Wrong Input")
             self.get_w()
 
@@ -89,7 +92,8 @@ class Elliptic:
     def PSOR_Solver(self):
         return
 
-    def Compute(self, scheme):
+    def Main(self, scheme):
+        self.Initialize()
         self.scheme = scheme
         self.Scheme_Printer()
         self.Initial_Condition()
