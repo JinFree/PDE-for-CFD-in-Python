@@ -10,57 +10,42 @@ class Hyperbolic:
         self.scheme = 'Ex_Upwind'
 
     def Initialize(self):
+        if self.scheme == 'Ex_Upwind' or self.scheme == 'Lax_method' or self.scheme == 'Lax_Wendroff':
+            self.dx = 5.0
+            self.dt = 0.02
+            self.end_t = 1.0
+            self.L = 400
+            self.alpha = 250.0
+        elif self.scheme == 'Non_Ex_Upwind' or self.scheme == 'Non_Lax_Method' or self.scheme == 'Non_Lax_Wendroff':
+            self.dx = 0.1
+            self.dt = 0.1
+            self.end_t = 1.0
+            self.L = 4
+            self.alpha = 1.0
+
+
+    def Initialize_Time(self):
         self.time = 0.0
 
     def Scheme_Printer(self):
         if self.scheme == 'Ex_Upwind':
             print("Solve Explicit Upwind")
             self.Scheme_name = "Explicit Upwind"
-            self.dx = 5.0
-            self.dt = 0.02
-            self.end_t = 1.0
-            self.L = 400
-            self.alpha = 250.0
         elif self.scheme == 'Lax_method':
             print("Solve Lax Method")
             self.Scheme_name = "Lax Method"
-            self.dx = 5.0
-            self.dt = 0.02
-            self.end_t = 1.0
-            self.L = 400
-            self.alpha = 250.0
         elif self.scheme == 'Lax_Wendroff':
             print("Solve Lax Wendroff Method")
             self.Scheme_name = "Lax Wendroff Method"
-            self.dx = 5.0
-            self.dt = 0.02
-            self.end_t = 1.0
-            self.L = 400
-            self.alpha = 250.0
         elif self.scheme == 'Non_Ex_Upwind':
             print("Solve Nonlinear Explicit Method")
             self.Scheme_name = "Nonlinear Explicit Method"
-            self.dx = 0.1
-            self.dt = 0.1
-            self.end_t = 1.0
-            self.L = 4
-            self.alpha = 1.0
         elif self.scheme == 'Non_Lax_Method':
             print("Solve Nonlinear Lax Method")
             self.Scheme_name = "Nonlinear Lax Method"
-            self.dx = 0.1
-            self.dt = 0.1
-            self.end_t = 1.0
-            self.L = 4
-            self.alpha = 1.0
         elif self.scheme == 'Non_Lax_Wendroff':
             print("Solve Nonlinear Lax Wendroff Method")
             self.Scheme_name = "Nonlinear Lax Wendroff Method"
-            self.dx = 0.1
-            self.dt = 0.1
-            self.end_t = 1.0
-            self.L = 4
-            self.alpha = 1.0
         else:
             print("Wrong scheme input, ",end="")
             self.scheme = 'Ex_Upwind'
@@ -165,7 +150,7 @@ class Hyperbolic:
         self.Scheme_Printer()
         CFL = [1.0, 0.5, 0.25]
         for i in CFL:
-            self.Initialize()
+            self.Initialize_Time()
             self.CFL = i
             self.CalDeltaT()
             self.N = int(float(self.L)/self.dx)
