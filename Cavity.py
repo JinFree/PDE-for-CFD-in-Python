@@ -129,6 +129,7 @@ class Cavity:
             self.PGS()
             self.Check_Psi_Error()
             self.Psi = self.Psinew.copy()
+            print("\rStream Error = %.6f" % self.StreamError, end="")
         return
 
     def Main(self, ren, grid):
