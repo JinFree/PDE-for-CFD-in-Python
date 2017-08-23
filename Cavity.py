@@ -11,7 +11,7 @@ class Cavity:
         self.dx = 1.0 / float(self.Grid-1)
         self.dt = 0.0005
         self.U0 = 1.0
-        self.Ermax = 0.000001
+        self.Ermax = 0.00007
         self.U = np.random.randn(self.Grid, self.Grid)
         self.V = np.random.randn(self.Grid, self.Grid)
         self.W = np.random.randn(self.Grid, self.Grid)
@@ -77,12 +77,12 @@ class Cavity:
         return
 
     def Initial_Condition(self):
-        self.U = np.zeros(self.Grid, self.Grid)
-        self.V = np.zeros(self.Grid, self.Grid)
-        self.W = np.zeros(self.Grid, self.Grid)
-        self.Wnew = np.zeros(self.Grid, self.Grid)
-        self.Psi = np.zeros(self.Grid, self.Grid)
-        self.Psinew = np.zeros(self.Grid, self.Grid)
+        self.U = np.zeros((self.Grid, self.Grid))
+        self.V = np.zeros((self.Grid, self.Grid))
+        self.W = np.zeros((self.Grid, self.Grid))
+        self.Wnew = np.zeros((self.Grid, self.Grid))
+        self.Psi = np.zeros((self.Grid, self.Grid))
+        self.Psinew = np.zeros((self.Grid, self.Grid))
         for i in range(self.Grid):
             self.U[self.Grid-1][i] = self.U0
         return
@@ -150,6 +150,7 @@ class Cavity:
         self.Grid = grid
         self.Scheme_Printer()
         self.Initialize()
+        self.Initial_Condition()
         self.Dir_Write()
         while self.VorticityError > self.Ermax:
             self.Boundary_Condition()
@@ -159,7 +160,7 @@ class Cavity:
             self.Check_W_Error()
             self.Time_Marching()
             self.time += self.dt
-            print("\rtime = %.6r" % self.time, end="")
+            print("\rtime = %6.6f error = %6.6f" % (self.time, self.VorticityError), end="")
         print()
         self.Para_Write()
         self.Tec_Write()
