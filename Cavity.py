@@ -53,7 +53,7 @@ class Cavity:
         filename = "{0}/{1}, iter = {2}.dat".format(self.dirname, self.Scheme_name, self.iter)
         file = open(filename, 'w')
         file.write("VARIABLES = X, Y, U, V, W, Psi\n")
-        file.write("zone i=%d j=%d\n", self.Grid, self.Grid)
+        file.write("zone i=%d j=%d\n" % (self.Grid, self.Grid))
         for i in range(self.Grid):
             for j in range(self.Grid):
                 data = "%6.6f\t%6.6f\t%6.6f\t%6.6f\t%6.6f\t%6.6f\t%6.6f\n" % \
