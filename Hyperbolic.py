@@ -6,6 +6,7 @@ class Hyperbolic:
     enumerate(['Ex_Upwind', 'Lax_method', 'Lax_Wendroff',
                'Non_Ex_Upwind', 'Non_Lax_Method', 'Non_Lax_Wendroff'])
     PI = math.pi
+
     def __init__(self):
         self.scheme = 'Ex_Upwind'
 

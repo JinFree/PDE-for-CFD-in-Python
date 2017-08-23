@@ -4,6 +4,7 @@ import shutil
 import numpy as np
 class Parabolic:
     enumerate(['Explicit', 'Implicit'])
+
     def __init__(self):
         self.U0 = 40
         self.N = 41
