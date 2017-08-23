@@ -46,7 +46,7 @@ class Elliptic:
         for i in range(self.Gy):
             for j in range(self.Gx):
                 data = "%3.3f,%3.3f,%3.3f,%3.3f\n" % \
-                       (float(j*self.GridSize),float(i*self.GridSize),0.0,self.T[i][j])
+                       (float(j*self.GridSize), float(i*self.GridSize), 0.0, self.T[i][j])
                 file.write(data)
         file.close()
         return
