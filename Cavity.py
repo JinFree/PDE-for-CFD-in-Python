@@ -49,6 +49,19 @@ class Cavity:
             shutil.rmtree(self.dirname)
         os.mkdir(self.dirname)
         return
+    def Tec_Write(self):
+        filename = "{0}/{1}, iter = {2}.dat".format(self.dirname, self.Scheme_name, self.iter)
+        file = open(filename, 'w')
+        file.write("VARIABLES = X, Y, U, V, W, Psi\n")
+        file.write("zone i=%d j=%d\n", self.Grid, self.Grid)
+        for i in range(self.Grid):
+            for j in range(self.Grid):
+                data = "%6.6f\t%6.6f\t%6.6f\t%6.6f\t%6.6f\t%6.6f\t%6.6f\n" % \
+                       (float(j) * self.dx, float(i) * self.dx, 0.0, self.U[i][j],
+                        self.V[i][j], self.W[i][j], self.Psi[i][j])
+                file.write(data)
+        file.close()
+        return
 
     def Para_Write(self):
         filename = "{0}/{1}, iter = {2}.csv".format(self.dirname, self.Scheme_name, self.iter)
@@ -149,6 +162,7 @@ class Cavity:
             print("\rtime = %.6r" % self.time, end="")
         print()
         self.Para_Write()
+        self.Tec_Write()
         return
 
 
