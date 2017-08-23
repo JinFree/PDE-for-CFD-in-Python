@@ -23,10 +23,6 @@ class Hyperbolic:
             self.L = 4
             self.alpha = 1.0
 
-
-    def Initialize_Time(self):
-        self.time = 0.0
-
     def Scheme_Printer(self):
         if self.scheme == 'Ex_Upwind':
             print("Solve Explicit Upwind")
@@ -47,7 +43,7 @@ class Hyperbolic:
             print("Solve Nonlinear Lax Wendroff Method")
             self.Scheme_name = "Nonlinear Lax Wendroff Method"
         else:
-            print("Wrong scheme input, ",end="")
+            print("Wrong scheme input, ", end="")
             self.scheme = 'Ex_Upwind'
             self.Scheme_Printer()
 
@@ -55,13 +51,13 @@ class Hyperbolic:
         self.dt = self.CFL * self.dx / self.alpha
 
     def Dir_Write(self):
-        dirname = "Hyperbolic, {0}, c = {1}".format(self.Scheme_name, self.CFL)
+        self.dirname = "Hyperbolic, {0}, c = {1}".format(self.Scheme_name, self.CFL)
         path = os.getcwd()
-        dirname = os.path.join(path, dirname)
-        self.dirname = dirname
-        if os.path.isdir(dirname):
-            shutil.rmtree(dirname)  # 디렉토리가 존재하면 삭제하고 다시 계산# return # 디렉토리가 존재하면 덮어쓰기 #
-        os.mkdir(dirname)
+        self.dirname = os.path.join(path, self.dirname)
+        if os.path.isdir(self.dirname):
+            shutil.rmtree(self.dirname)  # 디렉토리가 존재하면 삭제하고 다시 계산# return # 디렉토리가 존재하면 덮어쓰기 #
+        os.mkdir(self.dirname)
+        return
 
     def Para_Write(self):
         filename = "{0}/{1}, c = {2}.csv.".format(self.dirname, self.Scheme_name, self.CFL)
@@ -69,7 +65,7 @@ class Hyperbolic:
         file = open(filename, 'w')
         file.write("X,Y,Z,Velocity\n")
         for i in range(self.N):
-            data = "%3.3f,%3.3f,%3.3f,%3.3f\n"%(float(i*self.dx),0.0,0.0,self.U[i])
+            data = "%3.3f,%3.3f,%3.3f,%3.3f\n" % (float(i*self.dx), 0.0, 0.0, self.U[i])
             file.write(data)
         file.close()
 
@@ -151,7 +147,7 @@ class Hyperbolic:
         self.Initialize()
         CFL = [1.0, 0.5, 0.25]
         for i in CFL:
-            self.Initialize_Time()
+            self.time = 0.0
             self.CFL = i
             self.CalDeltaT()
             self.N = int(float(self.L)/self.dx)
@@ -172,11 +168,9 @@ class Hyperbolic:
             print()
 
 
-
-
 def main():
-    ID = Hyperbolic()
-    return ID
+    func = Hyperbolic()
+    return func
 
 PyCompute = Hyperbolic()
 print("What Will you Compute?")
@@ -199,13 +193,13 @@ while I:
         ID = int(input())
 if ID == 1:
     PyCompute.Main('Ex_Upwind')
-if ID == 2:
+elif ID == 2:
     PyCompute.Main('Lax_method')
-if ID == 3:
+elif ID == 3:
     PyCompute.Main('Lax_Wendroff')
-if ID == 4:
+elif ID == 4:
     PyCompute.Main('Non_Ex_Upwind')
-if ID == 5:
+elif ID == 5:
     PyCompute.Main('Non_Lax_Method')
-if ID == 6:
+elif ID == 6:
     PyCompute.Main('Non_Lax_Wendroff')

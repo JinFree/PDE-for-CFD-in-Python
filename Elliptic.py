@@ -4,10 +4,8 @@ import shutil
 import numpy as np
 class Elliptic:
     enumerate(['Jacobi', 'PGS', 'PSOR'])
-    def __init__(self):
-        return
 
-    def Initialize(self):
+    def __init__(self):
         self.Gx = 21
         self.Gy = 41
         self.GridSize = 0.05
@@ -15,51 +13,43 @@ class Elliptic:
         self.Ermax = 0.000001
         self.T = np.random.randn(self.Gy, self.Gx)
         self.Tnew = np.random.randn(self.Gy, self.Gx)
-        self.scheme = 'Jacobi'
+        self.scheme = 'error'
         self.Scheme_name = "Error"
         self.Dirname = "Error"
         self.iter = 0
+        return
 
     def Scheme_Printer(self):
-        if self.scheme == 'Jacobi':
-            print("Solve Jacobi")
-            self.Scheme_name = "Jacobi"
-        elif self.scheme == 'PGS':
-            print("Solve PGS")
-            self.Scheme_name = "PGS"
-        elif self.scheme == 'PSOR':
-            print("Solve PSOR")
-            self.Scheme_name = "PSOR"
-            self.get_w()
-        else:
-            print("Wrong scheme input, solve Jacobi")
-            self.scheme = 'Jacobi'
-            self.Scheme_name = "Jacobi"
+        print("Solve {0}".format(self.scheme))
+        self.Scheme_name = "%s"%self.scheme
+        return
 
     def Dir_Write(self):
         if self.Scheme_name == "PSOR":
-            dirname = "Elliptic, {0}, w={1}".format(self.Scheme_name, self.w)
+            self.dirname = "Elliptic, {0}, w={1}".format(self.Scheme_name, self.w)
         else:
-            dirname = "Elliptic, {0}".format(self.Scheme_name)
+            self.dirname = "Elliptic, {0}".format(self.Scheme_name)
         path = os.getcwd()
-        dirname = os.path.join(path, dirname)
-        self.dirname = dirname
-        if os.path.isdir(dirname):
-            shutil.rmtree(dirname)  # 디렉토리가 존재하면 삭제하고 다시 계산# return # 디렉토리가 존재하면 덮어쓰기 #
-        os.mkdir(dirname)
+        self.dirname = os.path.join(path, self.dirname)
+        if os.path.isdir(self.dirname):
+            shutil.rmtree(self.dirname)  # 디렉토리가 존재하면 삭제하고 다시 계산# return # 디렉토리가 존재하면 덮어쓰기 #
+        os.mkdir(self.dirname)
+        return
 
     def Para_Write(self):
         if self.Scheme_name == "PSOR":
             filename = "{0}/{1}, w = {2}, iter = {3}.csv".format(self.dirname, self.Scheme_name, self.w, self.iter)
         else:
             filename = "{0}/{1}, iter = {2}.csv".format(self.dirname, self.Scheme_name, self.iter)
-        file = open(filename,'w')
+        file = open(filename, 'w')
         file.write("X,Y,Z,Temperature\n")
         for i in range(self.Gy):
             for j in range(self.Gx):
-                data = "%3.3f,%3.3f,%3.3f,%3.3f\n"%(float(j*self.GridSize),float(i*self.GridSize),0.0,self.T[i][j])
+                data = "%3.3f,%3.3f,%3.3f,%3.3f\n" % \
+                       (float(j*self.GridSize),float(i*self.GridSize),0.0,self.T[i][j])
                 file.write(data)
         file.close()
+        return
 
     def get_w(self):
         prompt = """Input w, 1.0 ~ 1.9
@@ -75,6 +65,7 @@ Enter w: """
     def Initial_Condition(self):
         self.T = np.zeros((self.Gy, self.Gx))
         self.Tnew = np.zeros((self.Gy, self.Gx))
+        return
 
     def Boundary_Condition(self):
         for i in range(self.Gy):
@@ -87,6 +78,7 @@ Enter w: """
             self.Tnew[self.Gy-1][i] = 0
             self.T[0][i] = self.T0
             self.Tnew[0][i] = self.T0
+        return
 
     def CalErr(self):
         error = 0
@@ -97,11 +89,13 @@ Enter w: """
 
     def Memcpy(self):
         self.T = self.Tnew.copy()
+        return
 
     def Jacobi(self):
         for i in range(1, self.Gy-1):
             for j in range(1, self.Gx-1):
                 self.Tnew[i][j] = (self.T[i+1][j]+self.T[i-1][j]+self.T[i][j+1]+self.T[i][j-1])/4.0
+        return
 
     def Jacobi_Solver(self):
         self.iter = 0
@@ -112,11 +106,13 @@ Enter w: """
             self.Memcpy()
             self.iter += 1
             print("\rIteration = %d"%self.iter, end="")
+        return
 
     def PGS(self):
         for i in range(1, self.Gy-1):
             for j in range(1, self.Gx-1):
                 self.Tnew[i][j] = (self.T[i+1][j]+self.Tnew[i-1][j]+self.T[i][j+1]+self.Tnew[i][j-1])/4.0
+        return
 
     def PGS_Solver(self):
         self.iter = 0
@@ -127,11 +123,13 @@ Enter w: """
             self.Memcpy()
             self.iter += 1
             print("\rIteration = %d"%self.iter, end="")
+        return
 
     def PSOR(self):
         for i in range(1, self.Gy-1):
             for j in range(1, self.Gx-1):
                 self.Tnew[i][j] = (1.0 - self.w)*(self.T[i][j]) + self.w*(self.T[i+1][j]+self.Tnew[i-1][j]+self.T[i][j+1]+self.Tnew[i][j-1])/4.0
+        return
 
     def PSOR_Solver(self):
         self.iter = 0
@@ -142,9 +140,9 @@ Enter w: """
             self.Memcpy()
             self.iter += 1
             print("\rIteration = %d"%self.iter, end="")
+        return
 
     def Main(self, scheme):
-        self.Initialize()
         self.scheme = scheme
         self.Scheme_Printer()
         self.Initial_Condition()
@@ -158,17 +156,13 @@ Enter w: """
             self.PSOR_Solver()
         self.Para_Write()
         print()
+        return
+
 
 def main():
-    ID = Elliptic()
-    return ID
+    func = Elliptic()
+    return func
 
-def help():
-    prompt = """Compute function
-    'Jacobi'
-    'PGS'
-    'PSOR'"""
-    print(prompt)
 
 PyCompute = Elliptic()
 print("What Will you Compute?")
@@ -188,7 +182,7 @@ while I:
         ID = int(input())
 if ID == 1:
     PyCompute.Main('Jacobi')
-if ID == 2:
+elif ID == 2:
     PyCompute.Main('PGS')
-if ID == 3:
+elif ID == 3:
     PyCompute.Main('PSOR')

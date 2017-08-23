@@ -5,9 +5,6 @@ import numpy as np
 class Parabolic:
     enumerate(['Explicit', 'Implicit'])
     def __init__(self):
-        return
-
-    def Initialize(self):
         self.U0 = 40
         self.N = 41
         self.h = 0.04
@@ -23,18 +20,12 @@ class Parabolic:
         self.iter = int(self.t_end/self.dt)
         self.time = float(0.0)
         self.dirname = "Error"
+        return
 
     def Scheme_Printer(self):
-        if self.scheme == 'Explicit':
-            print("Solve Explicit")
-            self.Scheme_name = "Explicit"
-        elif self.scheme == 'Implicit':
-            print("Solve Implicit")
-            self.Scheme_name = "Implicit"
-        else:
-            print("Wrong scheme input, solve Explicit")
-            self.scheme = 'Explicit'
-            self.Scheme_name = "Explicit"
+        print("Solve {0}".format(self.scheme))
+        self.Scheme_name = "%s"%self.scheme
+        return
 
     def diffusion_number(self):
         self.diffusion = self.nu * self.dt / (math.pow(self.dx, 2))
@@ -57,21 +48,21 @@ class Parabolic:
         self.U = self.Unew.copy()
 
     def Dir_Write(self):
-        dirname = "Parabolic, {0}, d={1}".format(self.Scheme_name, self.diffusion)
+        self.dirname = "Parabolic, {0}, d={1}".format(self.Scheme_name, self.diffusion)
         path = os.getcwd()
-        dirname = os.path.join(path, dirname)
-        self.dirname = dirname
-        if os.path.isdir(dirname):
-            shutil.rmtree(dirname)  # 디렉토리가 존재하면 삭제하고 다시 계산# return # 디렉토리가 존재하면 덮어쓰기 #
-        os.mkdir(dirname)
+        self.dirname = os.path.join(path, self.dirname)
+        if os.path.isdir(self.dirname):
+            shutil.rmtree(self.dirname)  # 디렉토리가 존재하면 삭제하고 다시 계산# return # 디렉토리가 존재하면 덮어쓰기 #
+        os.mkdir(self.dirname)
+        return
 
     def Para_Write(self):
         filename = "{0}/{1}, d={2}.csv.".format(self.dirname, self.Scheme_name, self.diffusion)
         filename = "%s%.6f"%(filename, self.time)
-        file = open(filename,'w')
+        file = open(filename, 'w')
         file.write("X,Y,Z,Velocity\n")
         for i in range(len(self.U)):
-            data = "%3.3f,%3.3f,%3.3f,%3.3f\n"%(float(i*self.dx),0.0,0.0,self.U[i])
+            data = "%3.3f,%3.3f,%3.3f,%3.3f\n" % (float(i*self.dx), 0.0, 0.0, self.U[i])
             file.write(data)
         file.close()
 
@@ -117,7 +108,7 @@ class Parabolic:
         print()
 
     def Main(self, scheme):
-        self.Initialize()
+        self.time = 0.0
         self.scheme = scheme
         self.Scheme_Printer()
         self.dinamic_viscosity()
@@ -129,21 +120,16 @@ class Parabolic:
         else:
             self.Implicit_Solver()
 
-def main():
-    ID = Parabolic()
-    return ID
 
-def help():
-    prompt = """Main function
-    0: 'Explicit'
-    1: 'Implicit'"""
-    print(prompt)
+def main():
+    func = Parabolic()
+    return func
 
 PyCompute = Parabolic()
 print("What Will you Compute?")
 prompt = """
-1: Explicit
-2: Implicit
+1: Explicit FTCS
+2: Implicit Lassonen
 
 Enter Number(1~2): """
 ID = 5
@@ -156,5 +142,5 @@ while I:
         ID = int(input())
 if ID == 1:
     PyCompute.Main('Explicit')
-if ID == 2:
+elif ID == 2:
     PyCompute.Main('Implicit')
