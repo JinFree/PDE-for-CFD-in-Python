@@ -78,7 +78,7 @@ class Parabolic:
             self.FTCS()
             self.Time_Marching()
             self.time += self.dt
-            print("\rtime = %.6f"%self.time, end="")
+            print("\rtime = %.6f" % self.time, end="")
         print()
 
     def Lassonen_A_Mat(self):
