@@ -1,3 +1,4 @@
+from __future__ import print_function
 import math
 import os
 import shutil
@@ -21,6 +22,9 @@ class Cavity:
         self.VorticityError = 1.0
         self.iter = 0
         self.dirname = "Error"
+        self.c = 0.5 * self.dt / self.dx
+        self.d = self.dt / (float(self.ReN)*math.pow(self.dx, 2.0))
+        self.time = 0.0
         return
 
     def Initialize(self):
@@ -28,10 +32,12 @@ class Cavity:
         self.StreamError = 1.0
         self.VorticityError = 1.0
         self.iter = 0
+        self.c = 0.5 * self.dt / self.dx
+        self.d = self.dt / (float(self.ReN)*math.pow(self.dx, 2.0))
         return
 
     def Scheme_Printer(self):
-        print("Solve Caviry ReN is {0} and Grid is {1}".format(self.ReN, self.Grid))
+        print("Solve Cavity ReN is {0} and Grid is {1}".format(self.ReN, self.Grid))
         self.Scheme_name = "ReN = %4d, Grid = %3d"%(self.ReN,self.Grid)
         return
 
@@ -40,7 +46,7 @@ class Cavity:
         path = os.getcwd()
         self.dirname = os.path.join(path, self.dirname)
         if os.path.isdir(self.dirname):
-            shutil.rmtree(self.dirname)  # 디렉토리가 존재하면 삭제하고 다시 계산# return # 디렉토리가 존재하면 덮어쓰기 #
+            shutil.rmtree(self.dirname)
         os.mkdir(self.dirname)
         return
 
@@ -70,22 +76,59 @@ class Cavity:
 
     def Boundary_Condition(self):
         for i in range(self.Grid):
-            self.W[][]
+            self.W[i][self.Grid-1] = 2.0 * (self.Psi[i][self.Grid-1] - self.Psi[i][self.Grid-2]) / math.pow(self.dx, 2.0)
+            self.W[i][0] = 2.0 * (self.Psi[i][0] - self.Psi[i][2]) / math.pow(self.dx, 2.0)
+            self.W[self.Grid-1][i] = 2.0 * (self.Psi[self.Grid-1][i] - self.Psi[self.Grid-2][i]) / math.pow(self.dx, 2.0) - 2.0 * self.U0 / self.dx
+            self.W[0][i] = 2.0 * (self.Psi[0][i] - self.Psi[1][i]) / math.pow(self.dx, 2.0)
         return
 
     def Velocity(self):
+        for i in range(1, self.Grid-1):
+            for j in range(1, self.Grid-1):
+                self.U[i][j] = (self.Psi[i+1][j] - self.Psi[i-1][j])/(2.0*self.dx)
+                self.V[i][j] = (self.Psi[i][j+1] - self.Psi[i][j-1])/(2.0*self.dx)
         return
 
     def Time_Marching(self):
+        self.W = self.Wnew.copy()
         return
 
-    def Check_Error(self):
+    def Check_W_Error(self):
+        for i in range(1, self.Grid-1):
+            for j in range(1, self.Grid-1):
+                error = abs(self.W[i][j] - self.Wnew[i][j])
+                self.VorticityError += math.pow(error, 2.0)
+        self.VorticityError = math.sqrt(self.VorticityError / math.pow(float(self.Grid-2), 2.0))
+        return
+
+    def Check_Psi_Error(self):
+        for i in range(1, self.Grid-1):
+            for j in range(1, self.Grid-1):
+                error = abs(self.Psi[i][j] - self.Psinew[i][j])
+                self.StreamError += math.pow(error, 2.0)
+        self.StreamError = math.sqrt(self.StreamError / math.pow(float(self.Grid-2), 2.0))
         return
 
     def Vorticity_FTCS(self):
-        return
+        for i in range(1, self.Grid-1):
+            for j in range(1, self.Grid-1):
+                self.Wnew[i][j] = (1.0 - 4.0 * self.d) * self.W[i][j]\
+                                  + (self.d - self.c * self.U[i][j+1]) * self.W[i][j+1]\
+                                  + (self.d + self.c * self.U[i][j-1]) * self.W[i][j-1]\
+                                  + (self.d - self.c * self.V[i+1][j]) * self.W[i+1][j]\
+                                  + (self.d + self.c * self.V[i-1][j]) * self.W[i-1][j]
 
+        return
+    def PGS(self):
+        for i in range(1, self.Grid-1):
+            for j in range(1, self.Grid-1):
+                self.Psinew[i][j] = 0.25 * (self.Psi[i+1][j] + self.Psi[i-1][j] + self.Psi[i][j+1] + self.Psi[i][j-1]
+                                            + math.pow(self.dx, 2.0) * self.W[i][j])
     def Stream_PGS(self):
+        while self.StreamError > self.Ermax:
+            self.PGS()
+            self.Check_Psi_Error()
+            self.Psi = self.Psinew.copy()
         return
 
     def Main(self, ren, grid):
@@ -93,7 +136,18 @@ class Cavity:
         self.Grid = grid
         self.Scheme_Printer()
         self.Initialize()
-
+        self.Dir_Write()
+        while self.VorticityError > self.Ermax:
+            self.Boundary_Condition()
+            self.Vorticity_FTCS()
+            self.Stream_PGS()
+            self.Velocity()
+            self.Check_W_Error()
+            self.Time_Marching()
+            self.time += self.dt
+            print("\rtime = %.6r" % self.time, end="")
+        print()
+        self.Para_Write()
         return
 
 
