@@ -11,7 +11,8 @@ class Cavity:
         self.dx = 1.0 / float(self.Grid-1)
         self.dt = 0.0005
         self.U0 = 1.0
-        self.Ermax = 0.00005
+        self.Ermax = 0.005
+        #self.Ermax = 0.0000005
         self.U = np.random.randn(self.Grid, self.Grid)
         self.V = np.random.randn(self.Grid, self.Grid)
         self.W = np.random.randn(self.Grid, self.Grid)
@@ -38,7 +39,7 @@ class Cavity:
 
     def Scheme_Printer(self):
         print("Solve Cavity ReN is {0} and Grid is {1}".format(self.ReN, self.Grid))
-        self.Scheme_name = "ReN = %4d, Grid = %3d"%(self.ReN,self.Grid)
+        self.Scheme_name = "ReN = %4d, Grid = %3d" % (self.ReN, self.Grid)
         return
 
     def Dir_Write(self):
@@ -55,10 +56,10 @@ class Cavity:
         file = open(filename, 'w')
         file.write("VARIABLES = X, Y, U, V, W, Psi\n")
         file.write("zone i=%d j=%d\n" % (self.Grid, self.Grid))
-        for i in range(self.Grid):
-            for j in range(self.Grid):
+        for j in range(self.Grid):
+            for i in range(self.Grid):
                 data = "%6.6f\t%6.6f\t%6.6f\t%6.6f\t%6.6f\t%6.6f\n" % \
-                       (float(j) * self.dx, float(i) * self.dx, self.U[i][j],
+                       (float(i) * self.dx, float(j) * self.dx, self.U[i][j],
                         self.V[i][j], self.W[i][j], self.Psi[i][j])
                 file.write(data)
         file.close()
@@ -68,16 +69,16 @@ class Cavity:
         filename = "{0}/{1}, iter = {2}.csv".format(self.dirname, self.Scheme_name, self.iter)
         file = open(filename, 'w')
         file.write("X,Y,Z,U,V,W,Psi\n")
-        for i in range(self.Grid):
-            for j in range(self.Grid):
+        for j in range(self.Grid):
+            for i in range(self.Grid):
                 data = "%6.6f,%6.6f,%6.6f,%6.6f,%6.6f,%6.6f,%6.6f\n" % \
-                       (float(j)*self.dx, float(i)*self.dx, 0.0, self.U[i][j],
+                       (float(i)*self.dx, float(j)*self.dx, 0.0, self.U[i][j],
                         self.V[i][j], self.W[i][j], self.Psi[i][j])
                 file.write(data)
         file.close()
         return
 
-    def Initial_Condition(self):
+    def Initial_Condition(self):  # [x][y]
         self.U = np.zeros((self.Grid, self.Grid))
         self.V = np.zeros((self.Grid, self.Grid))
         self.W = np.zeros((self.Grid, self.Grid))
@@ -110,19 +111,23 @@ class Cavity:
         return
 
     def Check_W_Error(self):  # [x][y]
+        error = 0
         for j in range(1, self.Grid-1):
             for i in range(1, self.Grid-1):
-                error = abs(self.W[i][j] - self.Wnew[i][j])
-                self.VorticityError += math.pow(error, 2.0)
-        self.VorticityError = math.sqrt(self.VorticityError / math.pow(float(self.Grid-2), 2.0))
+                error += abs(self.W[i][j] - self.Wnew[i][j])
+        self.VorticityError = error
+                # self.VorticityError += math.pow(error, 2.0)
+        # self.VorticityError = math.sqrt(self.VorticityError / math.pow(float(self.Grid-2), 2.0))
         return
 
     def Check_Psi_Error(self):  # [x][y]
+        error = 0
         for j in range(1, self.Grid-1):
             for i in range(1, self.Grid-1):
-                error = abs(self.Psi[i][j] - self.Psinew[i][j])
-                self.StreamError += math.pow(error, 2.0)
-        self.StreamError = math.sqrt(self.StreamError / math.pow(float(self.Grid-2), 2.0))
+                error += abs(self.Psi[i][j] - self.Psinew[i][j])
+        self.StreamError = error
+                # self.StreamError += math.pow(error, 2.0)
+        # self.StreamError = math.sqrt(self.StreamError / math.pow(float(self.Grid-2), 2.0))
         return
 
     def Vorticity_FTCS(self):  # [x][y]
