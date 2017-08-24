@@ -115,9 +115,9 @@ class Cavity:
         for j in range(1, self.Grid-1):
             for i in range(1, self.Grid-1):
                 error += abs(self.W[i][j] - self.Wnew[i][j])
-        self.VorticityError = error
-                # self.VorticityError += math.pow(error, 2.0)
-        # self.VorticityError = math.sqrt(self.VorticityError / math.pow(float(self.Grid-2), 2.0))
+        # self.VorticityError = error
+                self.VorticityError += math.pow(error, 2.0)
+        self.VorticityError = math.sqrt(self.VorticityError / math.pow(float(self.Grid-2), 2.0))
         return
 
     def Check_Psi_Error(self):  # [x][y]
@@ -125,9 +125,9 @@ class Cavity:
         for j in range(1, self.Grid-1):
             for i in range(1, self.Grid-1):
                 error += abs(self.Psi[i][j] - self.Psinew[i][j])
-        self.StreamError = error
-                # self.StreamError += math.pow(error, 2.0)
-        # self.StreamError = math.sqrt(self.StreamError / math.pow(float(self.Grid-2), 2.0))
+        # self.StreamError = error
+                self.StreamError += math.pow(error, 2.0)
+        self.StreamError = math.sqrt(self.StreamError / math.pow(float(self.Grid-2), 2.0))
         return
 
     def Vorticity_FTCS(self):  # [x][y]
