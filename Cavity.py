@@ -144,8 +144,9 @@ class Cavity:
     def PGS(self):  # [x][y]
         for j in range(1, self.Grid-1):
             for i in range(1, self.Grid-1):
-                self.Psinew[i][j] = 0.25 * (self.Psi[i+1][j] + self.Psi[i-1][j] + self.Psi[i][j+1] + self.Psi[i][j-1]
-                                            + math.pow(self.dx, 2.0) * self.W[i][j])
+                self.Psinew[i][j] = 0.25 * (self.Psi[i+1][j] + self.Psinew[i-1][j] + self.Psi[i][j+1] + self.Psinew[i][j-1]
+                                            + math.pow(self.dx, 2.0) * self.Wnew[i][j])
+            
     def Stream_PGS(self):
         while self.StreamError > self.Ermax:
             self.PGS()
