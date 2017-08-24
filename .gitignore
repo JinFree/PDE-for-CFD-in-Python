@@ -4,3 +4,4 @@ Parabolic, Explicit, d=*/
 Parabolic, Implicit, d=0.501/
 Parabolic, Implicit, d=*/
 Hyperbolic, */
+*.dat
