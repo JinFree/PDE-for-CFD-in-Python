@@ -11,8 +11,8 @@ class Cavity:
         self.dx = 1.0 / float(self.Grid-1)
         self.dt = 0.0005
         self.U0 = 1.0
-        self.Ermax = 0.005
-        #self.Ermax = 0.0000005
+        # self.Ermax = 0.005
+        self.Ermax = 0.0000005
         self.U = np.random.randn(self.Grid, self.Grid)
         self.V = np.random.randn(self.Grid, self.Grid)
         self.W = np.random.randn(self.Grid, self.Grid)
@@ -106,26 +106,36 @@ class Cavity:
                 self.V[i][j] = -(self.Psi[i+1][j] - self.Psi[i-1][j])/(2.0*self.dx)
         return
 
-    def Time_Marching(self):
-        self.W = self.Wnew.copy()
+    def Time_Marching_W(self):
+        for j in range(1, self.Grid-1):
+            for i in range(1, self.Grid-1):
+                temp = self.Wnew[i][j]
+                self.W[i][j] = temp
+        return
+
+    def Time_Marching_Psi(self):
+        for j in range(1, self.Grid-1):
+            for i in range(1, self.Grid-1):
+                temp = self.Psinew[i][j]
+                self.Psi[i][j] = temp
         return
 
     def Check_W_Error(self):  # [x][y]
+        self.VorticityError = 0
         error = 0
         for j in range(1, self.Grid-1):
             for i in range(1, self.Grid-1):
-                error += abs(self.W[i][j] - self.Wnew[i][j])
-        # self.VorticityError = error
+                error = abs(self.W[i][j] - self.Wnew[i][j])
                 self.VorticityError += math.pow(error, 2.0)
         self.VorticityError = math.sqrt(self.VorticityError / math.pow(float(self.Grid-2), 2.0))
         return
 
     def Check_Psi_Error(self):  # [x][y]
+        self.StreamError = 0
         error = 0
         for j in range(1, self.Grid-1):
             for i in range(1, self.Grid-1):
-                error += abs(self.Psi[i][j] - self.Psinew[i][j])
-        # self.StreamError = error
+                error = abs(self.Psi[i][j] - self.Psinew[i][j])
                 self.StreamError += math.pow(error, 2.0)
         self.StreamError = math.sqrt(self.StreamError / math.pow(float(self.Grid-2), 2.0))
         return
@@ -138,21 +148,24 @@ class Cavity:
                                   + (self.d + self.c * self.U[i-1][j]) * self.W[i-1][j]\
                                   + (self.d - self.c * self.V[i][j+1]) * self.W[i][j+1]\
                                   + (self.d + self.c * self.V[i][j-1]) * self.W[i][j-1]
-
         return
 
     def PGS(self):  # [x][y]
         for j in range(1, self.Grid-1):
             for i in range(1, self.Grid-1):
-                self.Psinew[i][j] = 0.25 * (self.Psi[i+1][j] + self.Psinew[i-1][j] + self.Psi[i][j+1] + self.Psinew[i][j-1]
+                self.Psinew[i][j] = 0.25 * (self.Psi[i+1][j] + self.Psinew[i-1][j]
+                                            + self.Psi[i][j+1] + self.Psinew[i][j-1]
                                             + math.pow(self.dx, 2.0) * self.Wnew[i][j])
-            
+
     def Stream_PGS(self):
+        self.StreamError = 1.0
         while self.StreamError > self.Ermax:
             self.PGS()
             self.Check_Psi_Error()
-            self.Psi = self.Psinew.copy()
-            print("\rStream Error = %.6f" % self.StreamError, end="")
+            self.Time_Marching_Psi()
+            print(
+                "\rtime = %6.6f Stream = %8.8f Vorticity = %8.8f" % (self.time, self.StreamError, self.VorticityError),
+                end="")
         return
 
     def Main(self, ren, grid):
@@ -162,16 +175,17 @@ class Cavity:
         self.Initialize()
         self.Initial_Condition()
         self.Dir_Write()
+        self.VorticityError = 1.0
         while self.VorticityError > self.Ermax:
             self.Boundary_Condition()
             self.Vorticity_FTCS()
             self.Stream_PGS()
             self.Velocity()
             self.Check_W_Error()
-            self.Time_Marching()
+            self.Time_Marching_W()
             self.time += self.dt
             self.iter += 1
-            print("\rtime = %6.6f error = %6.6f" % (self.time, self.VorticityError), end="")
+            print("\rtime = %6.6f Stream = %8.8f Vorticity = %8.8f" % (self.time, self.StreamError, self.VorticityError), end="")
         print()
         self.Para_Write()
         self.Tec_Write()
