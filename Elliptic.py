@@ -1,8 +1,9 @@
 # -*-coding:utf-8- -*-
-import math
 import os
 import shutil
 import numpy as np
+
+
 class Elliptic:
     enumerate(['Jacobi', 'PGS', 'PSOR'])
 

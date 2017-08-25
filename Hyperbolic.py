@@ -3,6 +3,8 @@ import math
 import os
 import shutil
 import numpy as np
+
+
 class Hyperbolic:
     enumerate(['Ex_Upwind', 'Lax_method', 'Lax_Wendroff',
                'Non_Ex_Upwind', 'Non_Lax_Method', 'Non_Lax_Wendroff'])

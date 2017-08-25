@@ -3,6 +3,8 @@ import math
 import os
 import shutil
 import numpy as np
+
+
 class Cavity:
     def __init__(self):
         self.ReN = 100
@@ -11,7 +13,6 @@ class Cavity:
         self.dx = 1.0 / float(self.Grid-1)
         self.dt = 0.0005
         self.U0 = 1.0
-        # self.Ermax = 0.005
         self.Ermax = 0.0000005
         self.U = np.random.randn(self.Grid, self.Grid)
         self.V = np.random.randn(self.Grid, self.Grid)
@@ -195,21 +196,23 @@ class Cavity:
 def main():
     ID = Cavity()
     return ID
+
 PyCompute = Cavity()
 print("What ReN will you compute?")
 prompt = """
-1: ReN = 100  Grid = 129
-2: ReN = 400  Grid = 129
-3: ReN = 400  Grid = 257
-4: ReN = 1000 Grid = 129
-5: ReN = 3200 Grid = 129
-6: ReN = 5000 Grid = 257
+1: ReN = 100   Grid = 129
+2: ReN = 400   Grid = 129
+3: ReN = 400   Grid = 257
+4: ReN = 1000  Grid = 129
+5: ReN = 3200  Grid = 129
+6: ReN = 5000  Grid = 257
+7: ReN = 10000 Grid = 257
 
 Enter Number(1~6): """
 ID = 0
 I = 1
 while I:
-    if 0 < ID < 7:
+    if 0 < ID < 8:
         I = 0
     else:
         print(prompt)
@@ -226,3 +229,5 @@ elif ID == 5:
     PyCompute.Main(3200, 129)
 elif ID == 6:
     PyCompute.Main(5000, 257)
+elif ID == 7:
+    PyCompute.Main(10000, 257)
