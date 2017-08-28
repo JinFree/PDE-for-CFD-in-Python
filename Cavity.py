@@ -208,7 +208,7 @@ prompt = """
 6: ReN = 5000  Grid = 257
 7: ReN = 10000 Grid = 257
 
-Enter Number(1~6): """
+Enter Number(1~7): """
 ID = 0
 I = 1
 while I:
