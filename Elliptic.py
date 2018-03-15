@@ -19,6 +19,7 @@ class Elliptic:
         self.Scheme_name = "Error"
         self.Dirname = "Error"
         self.iter = 0
+        self.w = 1.5
         return
 
     def Scheme_Printer(self):
